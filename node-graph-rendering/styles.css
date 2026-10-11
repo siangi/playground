@@ -1,3 +1,9 @@
+@property --rotation {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
 html {
   height: 100%;
   background: 50% 50% no-repeat
@@ -10,6 +16,8 @@ html {
   align-items: center;
   justify-content: center;
   border: 1px solid lightgray;
+
+  --connector-width: 3px;
 }
 
 .node {
@@ -17,14 +25,18 @@ html {
   width: var(--node-size);
   aspect-ratio: 1;
   background: gray;
-  border: 1px solid black;
   border-radius: 100%;
 
   &.node--parent {
     anchor-name: --node-main;
     background: red;
   }
-
+  /*
+  Problem: In the demo I have they all share the same containing block and are all siblings! Which means
+  using two anchors is not a problem with position absolute. And the scoping is not ruining anything. 
+  Maybe I could get around the forced node structure by also giving each of the nodes names. but then sibling count
+  wouldn't work anymore!!!!
+  */
   &.node--child {
     --degree-step: calc(360deg / sibling-count());
     --rotation: calc(var(--degree-step) * sibling-index());
@@ -39,7 +51,8 @@ html {
 
     top: calc(anchor(top) + var(--top-offset) * var(--distance-to-center));
     right: calc(anchor(right) + var(--left-offset) * var(--distance-to-center));
-
+    
+    /*
     &::before {
         content: "";
         display: block;
@@ -47,12 +60,76 @@ html {
         border: 1px solid black;
         bottom: anchor(--node-main center);
         left: anchor(--node-main center);
-        height: var(--distance-to-center);
+        top: anchor(--node-child center);
+        right: anchor(--node-child center);
         transform-origin: bottom center;
         transform: rotate(var(--rotation));
+    }*/
+
+  }
+}
+
+.node--child__connectors {
+  .connector {
+    position: fixed;
+    container-type: size;
+    --center-anchor-1: calc(anchor(--node-child inside) + anchor-size(--node-child)/2);
+    --center-anchor-2: calc(anchor(--node-main inside) + anchor-size(--node-main)/2 - .1px);
+    z-index: -1;
+    
+
+    &::before {
+      content: "";
+      position: absolute;
+      width: max(100cqw);
+      height: max(100cqh);
+      background: var(--background);
+      opacity: calc(sign(1cqw)*sign(1cqh)); 
+      background-color: rgb(0, 0, 0, 0.3);
+      
     }
+  }    
+
+  :is(.connector--a,.connector--b) {
+    top:  calc(var(--center-anchor-1) - var(--connector-width) / 2); 
+    bottom: calc(var(--center-anchor-2) - var(--connector-width) / 2);
+  }
+  :is(.connector--a,.connector--c) {
+    left: calc(var(--center-anchor-1) - var(--connector-width) / 2); 
+    right:  calc(var(--center-anchor-2) - var(--connector-width) / 2)
+  }
+  :is(.connector--c,.connector--d) {
+    top:  calc(var(--center-anchor-2) - var(--connector-width) / 2); 
+    bottom: calc(var(--center-anchor-1) - var(--connector-width) / 2)
+  }
+  :is(.connector--b,.connector--d) {
+    left: calc(var(--center-anchor-2) - var(--connector-width) / 2); 
+    right:  calc(var(--center-anchor-1) - var(--connector-width) / 2)
   }
 
+  .connector--b::before,
+  .connector--c::before {
+    clip-path: polygon(
+    calc(100cqw - var(--connector-width)) 0,
+    100cqw 0,
+    100cqw var(--connector-width),
+    var(--connector-width) 100cqh,
+    0 100cqh,
+    0 calc(100cqh - var(--connector-width))
+    );
+  }
+
+  .connector--a::before,
+  .connector--d::before {
+    clip-path: polygon(
+      0 var(--connector-width),
+      0 0,
+      var(--connector-width) 0,
+      100cqw calc(100cqh - var(--connector-width)),
+      100cqw 100cqh,
+      calc(100cqw - var(--connector-width)) 100cqh
+      );
+  }
 }
 
 
