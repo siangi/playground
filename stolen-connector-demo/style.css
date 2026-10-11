@@ -1,0 +1,61 @@
+.arrow {
+  /* arrow size  */
+  --arrow-head-width: 15px;
+  --arrow-head-length: 17px;
+  /* */
+  --line-width: 10px; /* control line height */
+  --r: 12px; /* radius of the small cirles  */
+  /**/
+  --g: 10px; /* gap between the arrow and circles */
+  pointer-events: none;
+  --anchor-name-1: attr(x type(<custom-ident>));
+  --anchor-name-2: attr(y type(<custom-ident>));
+  --r1: calc(attr(size_x type(<length>))/2);
+  --r2: calc(attr(size_y type(<length>))/2);
+}
+
+.arrow :is(a,b,c,d) {
+  position: absolute;
+  --center-anchor-1: calc(anchor(var(--anchor-name-1) inside) + anchor-size(var(--anchor-name-1))/2 - .1px);
+  --center-anchor-2: calc(anchor(var(--anchor-name-2) inside) + anchor-size(var(--anchor-name-2))/2);
+  container-type: size;
+}
+.arrow :is(a,b) {top:  var(--center-anchor-1); bottom: var(--center-anchor-2)}
+.arrow :is(a,c) {left: var(--center-anchor-1); right:  var(--center-anchor-2)}
+.arrow :is(c,d) {top:  var(--center-anchor-2); bottom: var(--center-anchor-1)}
+.arrow :is(b,d) {left: var(--center-anchor-2); right:  var(--center-anchor-1)}
+
+.arrow :is(a,b,c,d):before {
+  content: "";
+  position: absolute;
+  inset: 100% 0 -10px calc(100% - hypot(100cqh,100cqw));
+  rotate: atan(100cqh/100cqw);
+  /*border-image: conic-gradient(#556270) fill 0//999px;*/
+  background: darkgrey;
+
+  transform-origin: right;
+  
+  opacity: calc(sign(1cqw)*sign(1cqh)); 
+}
+.arrow b {scale: -1  1}
+.arrow c {scale:  1 -1}
+.arrow d {scale: -1 -1}
+
+
+.circle {
+  position: absolute;
+  left: 10%;
+  top: 10%;
+  width: calc(attr(size type(<length>)));
+  aspect-ratio: 1;
+  background: #45ADA8;
+  border-radius: 50%;
+  anchor-name: attr(name type(<custom-ident>));
+}
+.circle + .circle {
+  background: #FA6900;
+  left: 72%;
+  top: 40%;
+}
+
+
