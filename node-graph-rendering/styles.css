@@ -1,0 +1,58 @@
+html {
+  height: 100%;
+  background: 50% 50% no-repeat
+}
+
+.network-container {
+  width: 100cqw;
+  height: 100cqh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid lightgray;
+}
+
+.node {
+  --node-size: 2rem;
+  width: var(--node-size);
+  aspect-ratio: 1;
+  background: gray;
+  border: 1px solid black;
+  border-radius: 100%;
+
+  &.node--parent {
+    anchor-name: --node-main;
+    background: red;
+  }
+
+  &.node--child {
+    --degree-step: calc(360deg / sibling-count());
+    --rotation: calc(var(--degree-step) * sibling-index());
+    --top-offset: sin(var(--rotation));
+    --left-offset: cos(var(--rotation));
+    --distance-to-center: calc(var(--node-size) * 3);
+    anchor-name: --node-child;
+    anchor-scope: --node-child;
+    
+    position: absolute;
+    position-anchor: --node-main;
+
+    top: calc(anchor(top) + var(--top-offset) * var(--distance-to-center));
+    right: calc(anchor(right) + var(--left-offset) * var(--distance-to-center));
+
+    &::before {
+        content: "";
+        display: block;
+        position: fixed;
+        border: 1px solid black;
+        bottom: anchor(--node-main center);
+        left: anchor(--node-main center);
+        height: var(--distance-to-center);
+        transform-origin: bottom center;
+        transform: rotate(var(--rotation));
+    }
+  }
+
+}
+
+
